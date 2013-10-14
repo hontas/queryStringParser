@@ -1,0 +1,13 @@
+{
+  "name": "urlparser",
+  "version": "0.0.0",
+  "description": "Takes an url-search-string and turns it into an JavaScript object",
+  "main": "js/urlparser.js",
+  "scripts": {
+    "test": "karma start"
+  },
+  "repository": "",
+  "author": "Pontahontas",
+  "license": "BSD",
+  "devDependencies": {}
+}
