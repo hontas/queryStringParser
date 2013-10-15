@@ -1,13 +1,22 @@
 {
-  "name": "urlparser",
+  "name": "queryStringParser",
   "version": "0.0.0",
-  "description": "Takes an url-search-string and turns it into an JavaScript object",
-  "main": "js/urlparser.js",
+  "description": "Takes a query string and parses it to an JavaScript object",
+  "main": "js/queryStringParser.js",
   "scripts": {
     "test": "karma start"
   },
   "repository": "",
-  "author": "Pontahontas",
+  "author": "hontas",
   "license": "BSD",
-  "devDependencies": {}
+  "devDependencies": {
+    "karma": "~0.10.2",
+    "karma-mocha": "~0.1.0",
+    "karma-chrome-launcher": "~0.1.0",
+    "karma-firefox-launcher": "~0.1.0",
+    "karma-chai": "0.0.2",
+    "karma-osx-reporter": "0.0.3",
+    "mocha": "~1.13.0",
+    "karma-phantomjs-launcher": "~0.1.0"
+  }
 }
