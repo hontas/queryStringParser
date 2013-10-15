@@ -6,10 +6,11 @@
 [Sinon]: http://sinonjs.org/
 [karma-sinon-chai]: https://npmjs.org/package/karma-sinon-chai
 [decodeURIComponent]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
+[githubProj]: github.com/hontas/queryStringParser
 
 # Test driving TDD
 
-A friend asked me the other day - *Using only JavaScript, how can I read get-parameters from a url and parse it into an object?* And I thought - *that's a perfect opportunity for a little TDD!*
+A friend asked me the other day - *Using only JavaScript, how can I read get-parameters from a url and parse it into an object?* And I thought - *that's a perfect opportunity for a little TDD!* Note: we'll be writing test in a BDD-flavoured way.
 
 He wanted to turn `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=` into a JavaScript object that should look like this:
 
@@ -27,7 +28,7 @@ I'm assuming you have some knowledge of JavaScript, [node][node] installed and t
 
 You can go one of two ways here, either you keep reading this document which holds both the test cases and my solutions to them, or you can go to [another document I prepared]() where I leave out my solutions and can try your own, free from the distraction of mine.
 
-All files can be found here: [github.com/hontas/queryStringParser](https://github.com/hontas/queryStringParser)
+All files can be found here: [github.com/hontas/queryStringParser][githubProj]
 
 ## Setup
 
@@ -313,13 +314,143 @@ it("should meet the requirements", function() {
 
 Halleluja, it's working! Praise the test driven JavaScript [flying spaghetti monster!](http://en.wikipedia.org/wiki/Flying_Spaghetti_Monster)
 
-#todo
-## concatenate arrays
-
 ## Refactoring the code
-### Iterate!
 
-## Final words
-### nesting describe, before, beforeEach, sinon ont so weiter
+With all thoose tests making sure our code is working you can go ahead and refactor it in a worry-free fashion! The latest version of the tests and the code is on [github][githubProj], and below is how far we have come now.
 
-Having all the tests that we have, we can refactor with no fear as our tests imediatly will tell us when we brake something.
+```js
+// test/queryStringParser-test.js
+describe("queryStringParser", function() {
+	it("should be a function", function() {
+		expect(queryStringParser).to.exist;
+		expect(queryStringParser).to.be.a('function');
+	});
+
+	it("should return an object", function() {
+		var res = queryStringParser("");
+		expect(res).to.be.an("object");
+	});
+
+	it("should throw error if input is not a string", function(done) {
+		try {
+			queryStringParser();
+		} catch (e) {
+			done();
+		}
+	});
+
+	it("should return object with kays extracted from queryString", function() {
+		var res = queryStringParser('key=value&prop=thing');
+		expect(res).to.have.property('key').that.equal('value');
+		expect(res).to.have.property('prop').that.equal('thing');
+	});
+
+	it("should remove the initial question mark from queryString", function() {
+		expect(queryStringParser("?key=val")).to.have.property("key");
+	});
+
+	it("should replace each escaped sequence in the encoded URI component", function() {
+		var res = queryStringParser("author=Arthur%20C.%20Clarke");
+		expect(res.author).to.equal("Arthur C. Clarke");
+	});
+
+	it("should turn +-separated values into array", function() {
+		var res = queryStringParser("?letters=A%2BB%2BC%2BD");
+		expect(res.letters).to.eql(['A', 'B', 'C', 'D']);
+	});
+
+	it("should concatenate values to keys that already hold an array", function() {
+		var res = queryStringParser("nums=1%2B2&nums=3%2B4");
+		expect(res.nums).to.eql(['1', '2', '3', '4']);
+	});
+
+	it("should meet the requirements", function() {
+		var str = '?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=',
+			res = queryStringParser(str);
+		expect(res).to.have.property('taste')
+			.that.eql(['sweet', 'sour', 'salty', 'delicious', 'frosty']);
+		expect(res).to.have.property('start').that.equal("");
+		expect(res).to.have.property('end').that.equal("");
+	});
+});
+```
+
+```js
+// js/queryStringParser.js
+var queryStringParser = function(queryString) {
+	if ("string" !== typeof queryString) {
+		throw new Error("Input parameter must be string");
+	}
+
+	var ret = {};
+
+	if (queryString.charAt(0) === "?") {
+		queryString = decodeURIComponent(queryString.slice(1));
+	} else {
+		queryString = decodeURIComponent(queryString);
+	}
+
+	// extract key/value-pairs
+	queryString.split('&').forEach(function(keyVal) {
+		var keyValArr = keyVal.split('='),
+			key = keyValArr[0],
+			val = keyValArr[1];
+
+		if (/\+/.test(val)) {
+			val = val.split("+");
+		}
+
+		if (ret[key] && Array.isArray(ret[key])) {
+			val = ret[key].concat(val);
+		}
+
+		ret[key] = val;
+
+	});
+
+	return ret;
+};
+```
+
+## Taking it further
+
+This was one very simple function, but when you are working with, let's say objects and methods, then it's a good idea to nest the `describes` so that they reflect the structure of the code. I put a hash before method names and a dot before property names and I also frequently make use of `beforeEach` which executes before each test. Below is an eample to give you an idea. You can read more about it on [mocha's website](http://visionmedia.github.io/mocha/).
+
+```js
+describe("Person", function() {
+	
+	var person;
+
+	beforeEach(function() {
+		// one fresh instance of Person before each test
+		person = new Person;
+	});
+
+	describe("#ctor", function() { // constructor
+		it("should set correct properties", function() {
+			expect(person.friends).to.be.an("array").with.length(0);
+			expect(person.age).to.equal(0);
+		});
+	});
+
+	describe("#fullName", function() { // method
+		it("should return full name", function() {
+			person.set('firstName', 'Donald');
+			person.set('lastName', 'Duck');
+			expect(person.fullName()).to.equal('Donald Duck');
+		});
+	});
+
+	describe(".version", function() { // property
+		it("should be 1.0.1", function() {
+			expect(Person.version).to.equal('1.0.1');
+		});
+	});
+});
+```
+
+## Conslusion
+
+In the beginning of my testing I found it hard to define what and how to test. I'm still working on it, but it's more easy now, it comes naturally and I don't feel that it is slowing me down at all. But the best part for me is that when the initial tests are in place, refactoring is a breeze and I'm improving my code faster than ever, and coming back to an old piece of code I don't have to be afraid of breaking it, I can focus on a specific part instead of trying to understand the whole thing before I can begin improving it. It keeps me from trying to eat my knuckles, throwing around my computer and harrassing my invironment, it's a peacekeeper and someday I hope the [Nobel commity](http://www.nobelprize.org/) will aknowledge this soon.
+
+Don't hesitate to give me feedback on how to improve spelling or the tests, if something is unclear or not working for you, I'll try and answer as fast as I can. Thank you for reading.
