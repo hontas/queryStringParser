@@ -14,7 +14,9 @@
 
 # Test driving TDD - the fast track
 
-Project files and a more thoughrough article can be found here: [github.com/hontas/queryStringParser][githubProj]. It contains information on how to set up an environment for JavaScript testing and provide solutions to the tests as well, but here we focus only on the tests. I'm using [the mocha test framework][mocha] with [Chai][Chai] as assertion library, and I'm writing the tests in the flavour of [BDD][BDD].
+by [@pontahontas][@pontahontas] October 2013
+
+Project files and a more thorough article can be found here: [github.com/hontas/queryStringParser][githubProj]. It contains information on how to set up an environment for JavaScript testing and provide solutions to the tests as well, but here we focus only on the tests. I'm using [the mocha test framework][mocha] with [Chai][Chai] as assertion library, and I'm writing the tests in the flavor of [BDD][BDD].
 
 ## Requirements
 
@@ -30,7 +32,7 @@ Turn the query string `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&
 
 ## Writing tests
 
-The philosophy of [Test Driven Deleopment][TDD] is that you cannot write a single line of code without first having written a failing test case. So let's start with that.
+The philosophy of [Test Driven Development][TDD] is that you cannot write a single line of code without first having written a failing test case. So let's start with that.
 
 ### Our first failing test case
 
@@ -42,7 +44,7 @@ describe("queryStringParser", function() {
 	});
 });
 ```
-Now produce **only the code neccesary** to make the test not fail. Then write another failing test case. Produce the mininum amount of code to make it work. Keep doing this until you're done. At all times following [the principle of least effort](http://en.wikipedia.org/wiki/Principle_of_least_effort).
+Now produce **only the code necessary** to make the test not fail. Then write another failing test case. Produce the minimum amount of code to make it work. Keep doing this until you're done. At all times following [the principle of least effort](http://en.wikipedia.org/wiki/Principle_of_least_effort).
 
 ### Test input
 
