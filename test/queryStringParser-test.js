@@ -43,6 +43,11 @@ describe("queryStringParser", function() {
 		expect(res.nums).to.eql(['1', '2', '3', '4']);
 	});
 
+	it('should turn old value into an array if there are more values for same key and concatenate them', function() {
+		var res = queryStringParser("nums=1&nums=2&nums=3%2B4");
+		expect(res.nums).to.eql(['1', '2', '3', '4']);
+	})
+
 	it("should meet the requirements", function() {
 		var str = '?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=',
 			res = queryStringParser(str);
