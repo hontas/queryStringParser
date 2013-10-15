@@ -6,16 +6,36 @@
 [Sinon]: http://sinonjs.org/
 [karma-sinon-chai]: https://npmjs.org/package/karma-sinon-chai
 [decodeURIComponent]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
-[githubProj]: github.com/hontas/queryStringParser
+[github]: https://github.com
+[hontas]: https://github.com/hontas
+[githubProj]: https://github.com/hontas/queryStringParser
 [terminalWiki]: http://en.wikipedia.org/wiki/Terminal_(OS_X)
 [bashWiki]: http://en.wikipedia.org/wiki/Bash_(Unix_shell)
 [feedme]: https://github.com/hontas/queryStringParser/blob/master/FEEDME.md
+[packagejson]: https://github.com/hontas/queryStringParser/blob/master/package.json
+[git]: http://git-scm.com/downloads
+[BDD]: http://en.wikipedia.org/wiki/Behavior-driven_development
+[TDD]: http://en.wikipedia.org/wiki/Test-driven_development
+[@pontahontas]: https://twitter.com/pontahontas
 
 # Test driving TDD
 
-A friend asked me the other day - *Using only JavaScript, how can I read get-parameters from a url and parse it into an object?* And I thought - *that's a perfect opportunity for a little TDD!* Note: we'll be writing test in a BDD-flavoured way.
+by [@pontahontas][@pontahontas] October 2013
 
-He wanted to turn `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=` into a JavaScript object that should look like this:
+A friend asked me the other day -*"Using only JavaScript, how can I read get-parameters from a URL and parse it into an object?"* And I thought - *Perfect opportunity for a little TDD!*
+
+I'm assuming you have some knowledge of JavaScript, [node][node] installed and that you know your way around a shell such as the [Terminal][terminalWiki] or [git-bash][git].
+
+Now, you can go one of two ways here:
+
+1. Keep reading this document (which holds both the test cases and my solutions to them)
+2. Go to and read [another document I prepared][feedme] (which hold only the test cases)
+
+You'll find all files for this article here: [https://github.com/hontas/queryStringParser][githubProj]
+
+## Our friend the requirements
+
+Turn the query string `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=` into a JavaScript object that look like this:
 
 ```js
 {
@@ -25,17 +45,9 @@ He wanted to turn `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&star
 }
 ```
 
-That will be our requirements.
-
-I'm assuming you have some knowledge of JavaScript, [node][node] installed and that you know your way around a shell such as the [Terminal][terminalWiki] or [Bash][bashWiki].
-
-You can go one of two ways here, either you keep reading this document which holds both the test cases and my solutions to them, or you can go to [another document I prepared][feedme] where you can try your own solutions, free from the distraction of mine.
-
-All files can be found here: [github.com/hontas/queryStringParser][githubProj]
-
 ## Setup
 
-We'll be using [node][node] and [Karma][Karma] with the [mocha][mocha] test framework and [Chai][Chai] assertion library (they come bundled with Karma). I'll be using [my favorite text editor][Sublime], you can use whichever you like.
+We'll be using [node][node] and [Karma][Karma] with the [mocha test framework][mocha] and [Chai assertion library][Chai] (they come bundled with Karma). I'll be using [my favorite text editor][Sublime], you can use whichever you like.
 
 Create a new folder for the project and navigate to it (I named mine *queryStringParser*)
 
@@ -45,30 +57,13 @@ cd queryStringParser
 ```
 
 ### npm
-For good measure let's create a package.json (my answer below).
 
-```
-npm init
-```
-* description: *Takes a query string and parses it to a JavaScript object*
-* entry point: *js/queryStringParser.js*
-* test command: *karma start*
-* author: *hontas*
+Either create your own `package.json` with `npm init` or [copy mine][packagejson]. If you do copy mine, change the *repository* and *author* and then `npm install` to install all dependencies **or** follow the steps below.
 
 
 ### Karma
 
-Install [Karma][Karma]. I found that installing karma globally was a whole lot easier than installing it locally, I'll show you both ways and you can choose whichever you prefer.
-
-#### Installing Karma locally
-
-```
-npm install karma --save-dev
-npm install karma-mocha --save-dev
-npm link mocha
-npm install karma-chrome-launcher --save-dev
-npm install karma-firefox-launcher --save-dev
-```
+Install [Karma][Karma]. I found that installing karma globally was a whole lot easier than installing it locally. I'll show you both ways so that you can choose whichever you prefer.
 
 #### Installing Karma globally
 
@@ -76,10 +71,25 @@ npm install karma-firefox-launcher --save-dev
 npm install -g karma
 ```
 
-Create a configuration file (my answers below).
+Boom. You're done.
+
+#### Installing Karma locally
+
+```
+npm install karma --save-dev
+npm install mocha --save-dev
+npm install karma-mocha --save-dev
+npm install karma-chrome-launcher --save-dev
+npm install karma-firefox-launcher --save-dev
+```
+Prey that was all.
+
+#### Create a karma configuration file
+
 ```
 karma init
 ```
+* *My answers:*
 * testing framework: *mocha*
 * Require.js: *no*
 * Capture browser: *Chrome, Firefox*
@@ -87,25 +97,27 @@ karma init
 * Location of source/test files: _test/\*\*/\*-test.js_
 * Watch all the files: *yes*
 
-Open the newly created file karma.conf.js in your favorite text editor and add 'chai' to frameworks. If you did the local install you probalbly have to `npm install karma-chai --save-dev` to make it work. And if you're on a mac, you should also add the osx-reporter: `npm install karma-osx-reporter --save-dev` since it's very handy.
+Open the newly created file `karma.conf.js` in your favorite text editor and add *chai* to frameworks. If you did the local install you probalbly have to `npm install karma-chai --save-dev` for it to work. And if you're on a mac, you'll want the osx-reporter: `npm install karma-osx-reporter --save-dev` since it's very handy.
 
 ```js
 frameworks: ['mocha', 'chai'],
 reporters: ['progress', 'osx'],
 ```
 
-Finally create two files, `js/queryStringParser.js` and `test/queryStringParser-test.js`. You should also add a `README.md`. If you're reading this on github, then this is that file.
+#### Create some files
 
-Finally try it out by typing `npm test` or `karma start` (the first is linked to the latter in package.json). That should start up Chrome and Firefox and in the terminal/bash it should say something like `[...] Executed 0 of 0 ERROR (0.1 secs / 0 secs)` which is fine since we haven't written any tests yet.
+Finally create two files, `js/queryStringParser.js` and `test/queryStringParser-test.js` - these files correspond to the file pattern we set up in the `karma.conf.js`-file. You should also add a `README.md`. If you're reading this on [github][github], then this is that file.
+
+Finally try it out by typing `npm test` in your shell (if you copied my package.json) or `karma start` which should start up Chrome and Firefox and say something like `[...] Executed 0 of 0 ERROR (0.1 secs / 0 secs)` which is fine since we haven't written any tests yet.
 
 
 ## Writing tests
 
-The philosophy of test driven deleopment is that you cannot write a single line of code without having a failing test case first (you can [read more about that here](http://en.wikipedia.org/wiki/Test-driven_development)).
+The philosophy of [test driven development][TDD] is that you cannot write a single line of code without having written a failing test case first.
 
 ### Our first failing test case
 
-We're using [mocha][mocha] with [Chai][Chai] as assertian library, to read up on the Chai-syntax, [take a look here](http://chaijs.com/api/bdd/) and keep it open for reference. Next open up `test/queryStringParser-test.js` and enter:
+We're using [the mocha test framework][mocha] with [Chai assertian library][Chai] and we'll be writing our tests in [BDD-flavor][BDD]. To read up on the Chai-syntax, [take a look here](http://chaijs.com/api/bdd/) and keep it open for reference. Next open up `test/queryStringParser-test.js` and enter:
 
 ```js
 describe("queryStringParser", function() {
@@ -116,14 +128,19 @@ describe("queryStringParser", function() {
 });
 ```
 
-Save the file and take a look at the tests in terminal/bash - they should fail (if they're not running get them started by typing `npm test`). Now let's fix the failing test. In `js/queryStringParser.js` enter:
+First we *describe* what it is we will be testing, `queryStringParser`. Inside of the anonymous function callback comes our tests, defined by *it*. You don't have to begin all of the tests names	 with *should* but I think it's a good way to start a sentence that will be describing a test, so I'm going with that.
+
+The *it* also takes an anonymous function callback, and it's within this that we perform our test using *expect*. There are other ways to test, more on that [here][mocha] and [here][Chai].
+
+Save the file and take a look at the tests in your shell - it should fail. Now let's fix the failing test. In `js/queryStringParser.js` enter:
 
 ```js
 var queryStringParser = function(queryString) {};
 ```
-### The failing test case is strong with this one
 
-Take a look at the test again, it should now be green. Awesome! Test driven development FTW! Give yourself a big pat on the back and let's continue. Our approach is to **not write any code** without **first having written a failing test**, so let's do that (below the first it):
+Take a look at the test again, it should now be green. Awesome! Test driven development FTW! Give yourself a big pat on the back and let's continue. Our approach is to **not write any code** without **first having written a failing test**, so let's do that (after the first *it*):
+
+### Test function output
 
 ```js
 it("should return an object", function() {
@@ -132,7 +149,7 @@ it("should return an object", function() {
 });
 ```
 
-Make sure it's failing, and then fix it:
+Make sure it's failing, and then make it pass.
 
 ```js
 var queryStringParser = function(queryString) {
@@ -140,11 +157,11 @@ var queryStringParser = function(queryString) {
 };
 ```
 
-### The principle of least effort
+We only want to make the test pass, **nothing more** - faithfully abiding to [the principle of least effort](http://en.wikipedia.org/wiki/Principle_of_least_effort).
 
-We only want to make the test pass, **nothing more**.
+### Test input and test case order
 
-Since we will be handling queryStrings we should write a test to make sure the the input is a string. We'll do that with an *asynchronous* test, meaning that the test case will not be fulfilled untill `done()` is called. Notice the `done` in `function(done)` and when it's called within the catch-block.
+Since we will be handling queryStrings we should write a test to make sure the the input is a string. We'll do that with an *asynchronous* test, meaning that the test case will not be fulfilled until `done()` is called. Notice the `done` in `function(done)`.
 
 ```js
 it("should throw error if input is not a string", function(done) {
@@ -156,7 +173,7 @@ it("should throw error if input is not a string", function(done) {
 });
 ```
 
-You can [read more about testing asynchronous code here](http://visionmedia.github.io/mocha/#asynchronous-code). Now to fix our failing test:
+You can [read more about testing asynchronous code here](http://visionmedia.github.io/mocha/#asynchronous-code).
 
 ```js
 var queryStringParser = function(queryString) {
@@ -166,11 +183,13 @@ var queryStringParser = function(queryString) {
 	return {};
 };
 ```
-### Test case ordering
+Hmm, not working. Why? Because the second last test we wrote is now failing. This would not had been a problem if we'd written the input test first. *Something to remember.*
 
-Hmm, not working. Why? Because the second last test we wrote is now also failing, so let's add an empty string in that function call: `var res = queryStringParser('');` This would not had been a problem if we'd written the input test first. Something to remember.
+So let's add an empty string in the previous tests function call: `var res = queryStringParser('');`
 
-That should do it! Now let's divide the queryString into key/value-pairs that will be on the returned object.
+### Test output data
+
+Now let's divide the queryString into key/value-pairs that will be on the returned object.
 
 ```js
 it("should return object with keys extracted from queryString", function() {
@@ -209,7 +228,7 @@ it("should return object with keys extracted from queryString", function() {
 });
 ```
 
-Make sure the tests are failing, and then:
+Make sure the tests are failing, and then
 
 ```js
 queryString.split('&').forEach(function(keyVal) {
@@ -229,7 +248,7 @@ it("should remove the initial question mark from queryString", function() {
 
 ```
 
-I'm using slice but you can choose to use substr or substring if you wish. Take a look at [theese performance tests](http://jsperf.com/substring-extraction-methods-substring-substr-slice) before making up you mind. Add this above the forEach.
+I'm using `slice` for this but you can choose to use `substr` or `substring` if you wish. Take a look at [these performance tests](http://jsperf.com/substring-extraction-methods-substring-substr-slice) before making up you mind. Place this code above the forEach.
 
 ```js
 if (queryString.charAt(0) === "?") {
@@ -238,8 +257,6 @@ if (queryString.charAt(0) === "?") {
 ```
 ### Decode query string
 
-For this we'll use [decodeURIComponent][decodeURIComponent].
-
 ```js
 it("should replace each escaped sequence in the encoded URI component", function() {
 	var res = queryStringParser("?author=Arthur%20C.%20Clarke");
@@ -247,7 +264,7 @@ it("should replace each escaped sequence in the encoded URI component", function
 });
 ```
 
-Make it fail, then make it right!
+For this we'll be using [decodeURIComponent][decodeURIComponent].
 
 ```js
 if (queryString.charAt(0) === "?") {
@@ -259,7 +276,7 @@ if (queryString.charAt(0) === "?") {
 
 ### Split by plus
 
-Now it appears my friend wishes to split values containing `%2B` (`+`) into an array. I say ok. The expressions `to.eql` and `to.deep.equal` are the same.
+Now it appears the friend (our requirements) wishes us to split values containing `%2B` (decoded to `+`) into an array. I say ok.
 
 ```js
 it("should turn +-separated values into array", function() {
@@ -268,7 +285,7 @@ it("should turn +-separated values into array", function() {
 });
 ```
 
-Make it fly
+Note: `to.eql` can also be expressed as `to.deep.equal`
 
 ```js
 // meanwhile in the forEach...
@@ -280,7 +297,7 @@ ret[key] = val;
 
 ### Concatenate values
 
-According to our requirements one should be able to input the same key several times wich should append the values to the previous.
+According to the friend it should be possible to input the same key several times which should then append that value to the previous array.
 
 ```js
 it("should concatenate values to keys that already hold an array", function() {
@@ -289,7 +306,7 @@ it("should concatenate values to keys that already hold an array", function() {
 });
 ```
 
-Check if the key exist, and if it's an array, concatenate!
+Investigate, then concatenate!
 
 ```js
 if (ret[key] && Array.isArray(ret[key])) {
@@ -298,11 +315,11 @@ if (ret[key] && Array.isArray(ret[key])) {
 ret[key] = val;
 ```
 
-I'm aware this will not work if the first value only holds one value, and no plus-sign, but I'm leaving it like this for now because this solution is sufficient to meet our requirements, when they change, we add more tests.
+I'm aware this will not work if the first value only holds one value (no plus-sign), but I'm leaving it like this for now because this solution is sufficient to meet our requirements. And when they change, we add more tests.
 
-### Let's put it to the test
+### El grande finale - one test to rule them all
 
-One final test to see that we meet the requirements just for the sake of this article, please don't name your own test cases that way.
+One final test to see that we meet the requirements.
 
 ```js
 it("should meet the requirements", function() {
@@ -313,13 +330,13 @@ it("should meet the requirements", function() {
 	expect(res).to.have.property('start').that.equal("");
 	expect(res).to.have.property('end').that.equal("");
 });
-```
+``` 
 
-Halleluja, it's working! Praise the test driven JavaScript [flying spaghetti monster!](http://en.wikipedia.org/wiki/Flying_Spaghetti_Monster)
+Hallelujah, it's working! Praise the test driven JavaScript [flying spaghetti monster!](http://en.wikipedia.org/wiki/Flying_Spaghetti_Monster)
 
 ## Refactoring the code
 
-With all thoose tests making sure our code is working you can go ahead and refactor it in a worry-free fashion! The latest version of the tests and the code is on [github][githubProj], and below is how far we have come now.
+With all those tests making sure our code is working you can go ahead and re-factor it in a worry-free fashion! The latest version of the tests and the code is on [github][githubProj], and below is how far we have come now.
 
 ```js
 // test/queryStringParser-test.js
@@ -415,11 +432,20 @@ var queryStringParser = function(queryString) {
 };
 ```
 
+## Suggested improvements
+
+1. Maybe my friend decides he wanna be able to throw a whole URL on the function, then our question-mark-splice-remover no longer holds up. Try to add a test case for this and then improve the code to handle whole URL's as well.
+
+2. What if the new value is an array but not the old? Try writing a test case that account for that and then get it working.
+
 ## Taking it further
 
-This was one very simple function, but when you are working with, let's say objects and methods, then it's a good idea to nest the `describes` so that they reflect the structure of the code. I put a hash before method names and a dot before property names and I also frequently make use of `beforeEach` which executes before each test. Below is an eample to give you an idea. You can read more about it on [mocha's website](http://visionmedia.github.io/mocha/).
+This was one very simple function, but when you are working with, let's say objects and methods, then it's a good idea to nest the `describe`'s so that they reflect the structure of the code. I put a hash before method names and a dot before property names and I also frequently make use of `beforeEach` which executes before each test. Below is an example to give you an idea. You can read more about it on [mocha's website](http://visionmedia.github.io/mocha/).
+
+I also highly recommend trying out [sinonjs][Sinon] which gives you `spies`, `mocks`, `stubs` and a whole range of other tools that make your testing days easier than winning a tanning contest with a true nerd.
 
 ```js
+// test/models/person-test.js
 describe("Person", function() {
 	
 	var person;
@@ -452,8 +478,14 @@ describe("Person", function() {
 });
 ```
 
-## Conslusion
+## Final thoughts
 
-In the beginning of my testing I found it hard to define what and how to test. I'm still working on it, but it's more easy now, it comes naturally and I don't feel that it is slowing me down at all. But the best part for me is that when the initial tests are in place, refactoring is a breeze and I'm improving my code faster than ever, and coming back to an old piece of code I don't have to be afraid of breaking it, I can focus on a specific part instead of trying to understand the whole thing before I can begin improving it. It keeps me from trying to eat my knuckles, throwing around my computer and harrassing my invironment, it's a peacekeeper and someday I hope the [Nobel commity](http://www.nobelprize.org/) will aknowledge this soon.
+In the beginning of my testing days I found it hard to define what and how to test. I spent a lot of time trying to figure out what to test, how to test it and how to write good test descriptions. I'm still working on this, but it's more easy now, it comes naturally and I don't feel that it is slowing me down. Actually I find myself thinking about how to write tests first.
 
-Don't hesitate to give me feedback on how to improve spelling or the tests, if something is unclear or not working for you, I'll try and answer as fast as I can. Thank you for reading.
+So I ask you, in the words of Jamie Walters: [Hold on, till you feel a little stronger. Hold on, to TDD](http://youtu.be/k_QGJE94iOM).
+
+And when the initial tests are in place, refactoring is a breeze, and coming back to an old piece of code I don't have to be afraid of breaking it. It keeps me from chewing on my knuckles, throwing furniture around and harassing my environment, it's a peace-keeper and someday I hope the [Nobel commity](http://www.nobelprize.org/) will acknowledge this.
+
+Don't hesitate to give me feedback, questions and suggested improvements. If something was unclear or not working for you, I'll try and answer as fast as I can. Thank you for reading.
+
+//Pontus, [hontas][hontas], [@pontahontas][@pontahontas]
