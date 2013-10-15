@@ -25,6 +25,10 @@ That will be our requirements.
 
 I'm assuming you have some knowledge of JavaScript, [node][node] installed and that you know your way around a shell such as the [Terminal](http://en.wikipedia.org/wiki/Terminal_(OS_X)) or [Bash](http://en.wikipedia.org/wiki/Bash_(Unix_shell)).
 
+You can go one of two ways here, either you keep reading this document which holds both the test cases and my solutions to them, or you can go to [another document I prepared]() where I leave out my solutions and can try your own, free from the distraction of mine.
+
+All files can be found here: [github.com/hontas/queryStringParser](https://github.com/hontas/queryStringParser)
+
 ## Setup
 
 We'll be using [node][node] and [Karma][Karma] with the [mocha][mocha] test framework and [Chai][Chai] assertion library (they come bundled with Karma). I'll be using [my favorite text editor][Sublime], you can use whichever you like.
@@ -79,10 +83,11 @@ karma init
 * Location of source/test files: _test/\*\*/\*-test.js_
 * Watch all the files: *yes*
 
-Open the newly created file karma.conf.js in your favorite text editor and add 'chai' to frameworks. If you did the local install you probalbly have to `npm install karma-chai --save-dev` to make it work.
+Open the newly created file karma.conf.js in your favorite text editor and add 'chai' to frameworks. If you did the local install you probalbly have to `npm install karma-chai --save-dev` to make it work. And if you're on a mac, you should also add the osx-reporter: `npm install karma-osx-reporter --save-dev` since it's very handy.
 
 ```js
 frameworks: ['mocha', 'chai'],
+reporters: ['progress', 'osx'],
 ```
 
 Finally create two files, `js/queryStringParser.js` and `test/queryStringParser-test.js`. You should also add a `README.md`. If you're reading this on github, then this is that file.
@@ -94,7 +99,7 @@ Finally try it out by typing `npm test` or `karma start` (the first is linked to
 
 The philosophy of test driven deleopment is that you cannot write a single line of code without having a failing test case first (you can [read more about that here](http://en.wikipedia.org/wiki/Test-driven_development)).
 
-### Our first test case
+### Our first failing test case
 
 We're using [mocha][mocha] with [Chai][Chai] as assertian library, to read up on the Chai-syntax, [take a look here](http://chaijs.com/api/bdd/) and keep it open for reference. Next open up `test/queryStringParser-test.js` and enter:
 
@@ -112,6 +117,7 @@ Save the file and take a look at the tests in terminal/bash - they should fail (
 ```js
 var queryStringParser = function(queryString) {};
 ```
+### The failing test case is strong with this one
 
 Take a look at the test again, it should now be green. Awesome! Test driven development FTW! Give yourself a big pat on the back and let's continue. Our approach is to **not write any code** without **first having written a failing test**, so let's do that (below the first it):
 
@@ -129,6 +135,8 @@ var queryStringParser = function(queryString) {
 	return {};
 };
 ```
+
+### The principle of least effort
 
 We only want to make the test pass, **nothing more**.
 
@@ -154,6 +162,7 @@ var queryStringParser = function(queryString) {
 	return {};
 };
 ```
+### Test case ordering
 
 Hmm, not working. Why? Because the second last test we wrote is now also failing, so let's add an empty string in that function call: `var res = queryStringParser('');` This would not had been a problem if we'd written the input test first. Something to remember.
 
@@ -184,6 +193,8 @@ var queryStringParser = function(queryString) {
 };
 ```
 
+### Extend the test case
+
 And then a test to make sure that the value makes it through as well, we change the test into this:
 
 ```js
@@ -205,7 +216,7 @@ queryString.split('&').forEach(function(keyVal) {
 });
 ```
 
-Now let's get rid of that question mark!
+### Remove the questionable mark
 
 ```js
 it("should remove the initial question mark from queryString", function() {
@@ -214,15 +225,16 @@ it("should remove the initial question mark from queryString", function() {
 
 ```
 
-We'll use slice because [my computer says it's faster](http://jsperf.com/substring-extraction-methods-substring-substr-slice). Add this above the forEach.
+I'm using slice but you can choose to use substr or substring if you wish. Take a look at [theese performance tests](http://jsperf.com/substring-extraction-methods-substring-substr-slice) before making up you mind. Add this above the forEach.
 
 ```js
 if (queryString.charAt(0) === "?") {
 	queryString = queryString.slice(1);
 }
 ```
+### Decode query string
 
-Now let's decode the query string with [decodeURIComponent][decodeURIComponent].
+For this we'll use [decodeURIComponent][decodeURIComponent].
 
 ```js
 it("should replace each escaped sequence in the encoded URI component", function() {
@@ -230,6 +242,7 @@ it("should replace each escaped sequence in the encoded URI component", function
 	expect(res.author).to.equal("Arthur C. Clarke");
 });
 ```
+
 Make it fail, then make it right!
 
 ```js
@@ -240,7 +253,9 @@ if (queryString.charAt(0) === "?") {
 }
 ```
 
-Now it appears my friend wishes to turn %2B or + (plus sign) into array. I say ok. `to.eql` and `to.deep.equal` is the same.
+### Split by plus
+
+Now it appears my friend wishes to split values containing `%2B` (`+`) into an array. I say ok. The expressions `to.eql` and `to.deep.equal` are the same.
 
 ```js
 it("should turn +-separated values into array", function() {
@@ -259,6 +274,52 @@ if (/\+/.test(val)) {
 ret[key] = val;
 ```
 
+### Concatenate values
+
+According to our requirements one should be able to input the same key several times wich should append the values to the previous.
+
+```js
+it("should concatenate values to keys that already hold an array", function() {
+	var res = queryStringParser("nums=1%2B2&nums=3%2B4");
+	expect(res.nums).to.eql(['1', '2', '3', '4']);
+});
+```
+
+Check if the key exist, and if it's an array, concatenate!
+
+```js
+if (ret[key] && Array.isArray(ret[key])) {
+	val = ret[key].concat(val);
+}
+ret[key] = val;
+```
+
+I'm aware this will not work if the first value only holds one value, and no plus-sign, but I'm leaving it like this for now because this solution is sufficient to meet our requirements, when they change, we add more tests.
+
+### Let's put it to the test
+
+One final test to see that we meet the requirements just for the sake of this article, please don't name your own test cases that way.
+
+```js
+it("should meet the requirements", function() {
+	var str = '?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=',
+		res = queryStringParser(str);
+	expect(res).to.have.property('taste')
+		.that.eql(['sweet', 'sour', 'salty', 'delicious', 'frosty']);
+	expect(res).to.have.property('start').that.equal("");
+	expect(res).to.have.property('end').that.equal("");
+});
+```
+
+Halleluja, it's working! Praise the test driven JavaScript [flying spaghetti monster!](http://en.wikipedia.org/wiki/Flying_Spaghetti_Monster)
+
+#todo
+## concatenate arrays
+
 ## Refactoring the code
+### Iterate!
+
+## Final words
+### nesting describe, before, beforeEach, sinon ont so weiter
 
 Having all the tests that we have, we can refactor with no fear as our tests imediatly will tell us when we brake something.
