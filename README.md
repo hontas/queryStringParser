@@ -7,6 +7,9 @@
 [karma-sinon-chai]: https://npmjs.org/package/karma-sinon-chai
 [decodeURIComponent]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/decodeURIComponent
 [githubProj]: github.com/hontas/queryStringParser
+[terminalWiki]: http://en.wikipedia.org/wiki/Terminal_(OS_X)
+[bashWiki]: http://en.wikipedia.org/wiki/Bash_(Unix_shell)
+[feedme]: https://github.com/hontas/queryStringParser/blob/master/FEEDME.md
 
 # Test driving TDD
 
@@ -24,9 +27,9 @@ He wanted to turn `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&star
 
 That will be our requirements.
 
-I'm assuming you have some knowledge of JavaScript, [node][node] installed and that you know your way around a shell such as the [Terminal](http://en.wikipedia.org/wiki/Terminal_(OS_X)) or [Bash](http://en.wikipedia.org/wiki/Bash_(Unix_shell)).
+I'm assuming you have some knowledge of JavaScript, [node][node] installed and that you know your way around a shell such as the [Terminal][terminalWiki] or [Bash][bashWiki].
 
-You can go one of two ways here, either you keep reading this document which holds both the test cases and my solutions to them, or you can go to [another document I prepared]() where I leave out my solutions and can try your own, free from the distraction of mine.
+You can go one of two ways here, either you keep reading this document which holds both the test cases and my solutions to them, or you can go to [another document I prepared][feedme] where you can try your own solutions, free from the distraction of mine.
 
 All files can be found here: [github.com/hontas/queryStringParser][githubProj]
 
@@ -199,7 +202,7 @@ var queryStringParser = function(queryString) {
 And then a test to make sure that the value makes it through as well, we change the test into this:
 
 ```js
-it("should return object with kays extracted from queryString", function() {
+it("should return object with keys extracted from queryString", function() {
 	var res = queryStringParser('key=value&prop=thing');
 	expect(res).to.have.property('key').that.equal('value');
 	expect(res).to.have.property('prop').that.equal('thing');
@@ -339,7 +342,7 @@ describe("queryStringParser", function() {
 		}
 	});
 
-	it("should return object with kays extracted from queryString", function() {
+	it("should return object with keys extracted from queryString", function() {
 		var res = queryStringParser('key=value&prop=thing');
 		expect(res).to.have.property('key').that.equal('value');
 		expect(res).to.have.property('prop').that.equal('thing');
