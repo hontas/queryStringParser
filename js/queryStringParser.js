@@ -1,7 +1,8 @@
 (function () {
 
-	function deQuestionMarkify(str) {
-		return str.charAt(0) === "?" ? str.slice(1) : str;
+	function splitByQMark(str) {
+		var arr = str.split("?");
+		return arr[arr.length - 1];
 	}
 	
 	var queryStringParser = function(queryString) {
@@ -9,7 +10,7 @@
 			throw new Error("Input parameter must be string");
 		}
 
-		var decodedString = decodeURIComponent(deQuestionMarkify(queryString)),
+		var decodedString = decodeURIComponent(splitByQMark(queryString)),
 			ret = {};
 
 		// extract key/value-pairs
