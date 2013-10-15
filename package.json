@@ -6,7 +6,7 @@
   "scripts": {
     "test": "karma start"
   },
-  "repository": "",
+  "repository": "https://github.com/hontas/queryStringParser.git",
   "author": "hontas",
   "license": "BSD",
   "devDependencies": {
