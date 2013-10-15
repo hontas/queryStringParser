@@ -1,6 +1,6 @@
 {
   "name": "queryStringParser",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Takes a query string and parses it to an JavaScript object",
   "main": "js/queryStringParser.js",
   "scripts": {
