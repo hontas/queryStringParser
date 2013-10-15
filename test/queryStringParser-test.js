@@ -1,7 +1,6 @@
 describe("queryStringParser", function() {
 
 	it("should be a function", function() {
-		expect(queryStringParser).to.exist;
 		expect(queryStringParser).to.be.a('function');
 	});
 
@@ -29,13 +28,15 @@ describe("queryStringParser", function() {
 	});
 
 	it("should replace each escaped sequence in the encoded URI component", function() {
-		var res = queryStringParser("author=Arthur%20C.%20Clarke");
-		expect(res.author).to.equal("Arthur C. Clarke");
+		var author = "Arthur C. Clarke",
+			res = queryStringParser("?author=" + encodeURIComponent(author));
+		expect(res.author).to.equal(author);
 	});
 
 	it("should turn +-separated values into array", function() {
-		var res = queryStringParser("?letters=A%2BB%2BC%2BD");
-		expect(res.letters).to.eql(['A', 'B', 'C', 'D']);
+		var letters = "A+B+C+D",
+			res = queryStringParser("?letters=" + encodeURIComponent(letters));
+		expect(res.letters).to.eql(letters.split("+"));
 	});
 
 	it("should concatenate values to keys that already hold an array", function() {
