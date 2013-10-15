@@ -1,4 +1,5 @@
 describe("queryStringParser", function() {
+
 	it("should be a function", function() {
 		expect(queryStringParser).to.exist;
 		expect(queryStringParser).to.be.a('function');
@@ -17,7 +18,7 @@ describe("queryStringParser", function() {
 		}
 	});
 
-	it("should return object with kays extracted from queryString", function() {
+	it("should return object with keys extracted from queryString", function() {
 		var res = queryStringParser('key=value&prop=thing');
 		expect(res).to.have.property('key').that.equal('value');
 		expect(res).to.have.property('prop').that.equal('thing');
@@ -50,4 +51,11 @@ describe("queryStringParser", function() {
 		expect(res).to.have.property('start').that.equal("");
 		expect(res).to.have.property('end').that.equal("");
 	});
+
+	it('should be able to handle a whole URL', function() {
+		var str = 'http://example.com/?cow=muu&cat=meow',
+			res = queryStringParser(str);
+		expect(res).to.have.property('cow').that.equal('muu');
+		expect(res).to.have.property('cat').that.equal('meow');
+	})
 });
