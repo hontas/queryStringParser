@@ -17,14 +17,16 @@
 		decodedString.split('&').forEach(function(keyVal) {
 			var keyValArr = keyVal.split('='),
 				key = keyValArr[0],
-				val = keyValArr[1];
+				val = keyValArr[1],
+				oldVal = ret[key];
 
 			if (/\+/.test(val)) {
 				val = val.split("+");
 			}
 
-			if (ret[key] && Array.isArray(ret[key])) {
-				val = ret[key].concat(val);
+			if (oldVal) {
+				var oldArr = Array.isArray(oldVal) ? oldVal : [oldVal];
+				val = oldArr.concat(val);
 			}
 
 			ret[key] = val;
