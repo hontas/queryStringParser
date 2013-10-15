@@ -12,7 +12,7 @@
 [terminalWiki]: http://en.wikipedia.org/wiki/Terminal_(OS_X)
 [bashWiki]: http://en.wikipedia.org/wiki/Bash_(Unix_shell)
 [feedme]: https://github.com/hontas/queryStringParser/blob/master/FEEDME.md
-[packagejson]: https://github.com/hontas/queryStringParser/blob/master/package.json
+[packagejson]: http://package.json.nodejitsu.com/
 [git]: http://git-scm.com/downloads
 [BDD]: http://en.wikipedia.org/wiki/Behavior-driven_development
 [TDD]: http://en.wikipedia.org/wiki/Test-driven_development
@@ -58,58 +58,42 @@ cd queryStringParser
 
 ### npm
 
-Either create your own `package.json` with `npm init` or [copy mine][packagejson]. If you do copy mine, change the *repository* and *author* and then `npm install` to install all dependencies **or** follow the steps below.
-
+Managing dependencies is a very good thing, but maybe it's out of scope for this article. However I encourage you to use and read about `package.json` [here](http://blog.nodejitsu.com/package-dependencies-done-right) and [here][packagejson].
 
 ### Karma
 
-Install [Karma][Karma]. I found that installing karma globally was a whole lot easier than installing it locally. I'll show you both ways so that you can choose whichever you prefer.
-
-#### Installing Karma globally
+Install [Karma][Karma] (globally), then install the karma-chai-plugin and finally create a karma configuration file. I list my answers below.
 
 ```
 npm install -g karma
-```
-
-Boom. You're done.
-
-#### Installing Karma locally
-
-```
-npm install karma --save-dev
-npm install mocha --save-dev
-npm install karma-mocha --save-dev
-npm install karma-chrome-launcher --save-dev
-npm install karma-firefox-launcher --save-dev
-```
-Prey that was all.
-
-#### Create a karma configuration file
-
-```
+npm install -g karma-chai
 karma init
 ```
-* *My answers:*
 * testing framework: *mocha*
 * Require.js: *no*
-* Capture browser: *Chrome, Firefox*
+* Capture browser: *Chrome*
 * Location of source/test files: _js/\*.js_
 * Location of source/test files: _test/\*\*/\*-test.js_
+* Exclude files:
 * Watch all the files: *yes*
 
-Open the newly created file `karma.conf.js` in your favorite text editor and add *chai* to frameworks. If you did the local install you probalbly have to `npm install karma-chai --save-dev` for it to work. And if you're on a mac, you'll want the osx-reporter: `npm install karma-osx-reporter --save-dev` since it's very handy.
+**Note:** If you're on windows, you might have to set an environment variable like `CHROME_BIN=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe` to get the chrome launcher to work. You can [read about how to do this here](http://www.nextofwindows.com/how-to-addedit-environment-variables-in-windows-7/).
+
+Open the newly created file `karma.conf.js` in your favorite text editor and add *chai* to frameworks. If you're on a mac, you'll want the osx-reporter too, install `npm install -g karma-osx-reporter` and add it to reporters.
 
 ```js
+// karma.conf.js
 frameworks: ['mocha', 'chai'],
 reporters: ['progress', 'osx'],
 ```
 
-#### Create some files
+#### Create two files
 
-Finally create two files, `js/queryStringParser.js` and `test/queryStringParser-test.js` - these files correspond to the file pattern we set up in the `karma.conf.js`-file. You should also add a `README.md`. If you're reading this on [github][github], then this is that file.
+Finally create two files, `js/queryStringParser.js` and `test/queryStringParser-test.js` - these files correspond to the file pattern we set up in the `karma.conf.js`-file.
 
-Finally try it out by typing `npm test` in your shell (if you copied my package.json) or `karma start` which should start up Chrome and Firefox and say something like `[...] Executed 0 of 0 ERROR (0.1 secs / 0 secs)` which is fine since we haven't written any tests yet.
-
+Finally try it out by typing `karma start` in your shell which should output something like this:
+![revolunet logo](img/karma-start.png "revolunet logo")
+ The `ERROR` is just saying thet we have no tests yet, so let's take care of that.
 
 ## Writing tests
 
@@ -117,12 +101,11 @@ The philosophy of [test driven development][TDD] is that you cannot write a sing
 
 ### Our first failing test case
 
-We're using [the mocha test framework][mocha] with [Chai assertian library][Chai] and we'll be writing our tests in [BDD-flavor][BDD]. To read up on the Chai-syntax, [take a look here](http://chaijs.com/api/bdd/) and keep it open for reference. Next open up `test/queryStringParser-test.js` and enter:
+We're using [the mocha test framework][mocha] with [Chai assertian library][Chai] and we'll be writing our tests in [BDD-flavor][BDD]. To read up on the Chai-syntax, [take a look here](http://chaijs.com/api/bdd/) and keep it open for reference. Open up `test/queryStringParser-test.js` and enter:
 
 ```js
 describe("queryStringParser", function() {
 	it("should be a function", function() {
-		expect(queryStringParser).to.exist;
 		expect(queryStringParser).to.be.a('function');
 	});
 });
@@ -135,7 +118,7 @@ The *it* also takes an anonymous function callback, and it's within this that we
 Save the file and take a look at the tests in your shell - it should fail. Now let's fix the failing test. In `js/queryStringParser.js` enter:
 
 ```js
-var queryStringParser = function(queryString) {};
+var queryStringParser = function() {};
 ```
 
 Take a look at the test again, it should now be green. Awesome! Test driven development FTW! Give yourself a big pat on the back and let's continue. Our approach is to **not write any code** without **first having written a failing test**, so let's do that (after the first *it*):
@@ -152,7 +135,7 @@ it("should return an object", function() {
 Make sure it's failing, and then make it pass.
 
 ```js
-var queryStringParser = function(queryString) {
+var queryStringParser = function() {
 	return {};
 };
 ```
@@ -259,8 +242,9 @@ if (queryString.charAt(0) === "?") {
 
 ```js
 it("should replace each escaped sequence in the encoded URI component", function() {
-	var res = queryStringParser("?author=Arthur%20C.%20Clarke");
-	expect(res.author).to.equal("Arthur C. Clarke");
+	var author = "Arthur C. Clarke",
+		res = queryStringParser("?author=" + encodeURIComponent(author));
+	expect(res.author).to.equal(author);
 });
 ```
 
@@ -280,8 +264,9 @@ Now it appears the friend (our requirements) wishes us to split values containin
 
 ```js
 it("should turn +-separated values into array", function() {
-	var res = queryStringParser("?letters=A%2BB%2BC%2BD");
-	expect(res.letters).to.eql(['A', 'B', 'C', 'D']);
+	var letters = "A+B+C+D",
+		res = queryStringParser("?letters=" + encodeURIComponent(letters));
+	expect(res.letters).to.eql(letters.split("+"));
 });
 ```
 
@@ -342,7 +327,6 @@ With all those tests making sure our code is working you can go ahead and re-fac
 // test/queryStringParser-test.js
 describe("queryStringParser", function() {
 	it("should be a function", function() {
-		expect(queryStringParser).to.exist;
 		expect(queryStringParser).to.be.a('function');
 	});
 
@@ -370,13 +354,15 @@ describe("queryStringParser", function() {
 	});
 
 	it("should replace each escaped sequence in the encoded URI component", function() {
-		var res = queryStringParser("author=Arthur%20C.%20Clarke");
-		expect(res.author).to.equal("Arthur C. Clarke");
+		var author = "Arthur C. Clarke",
+			res = queryStringParser("?author=" + encodeURIComponent(author));
+		expect(res.author).to.equal(author);
 	});
 
 	it("should turn +-separated values into array", function() {
-		var res = queryStringParser("?letters=A%2BB%2BC%2BD");
-		expect(res.letters).to.eql(['A', 'B', 'C', 'D']);
+		var letters = "A+B+C+D",
+			res = queryStringParser("?letters=" + encodeURIComponent(letters));
+		expect(res.letters).to.eql(letters.split("+"));
 	});
 
 	it("should concatenate values to keys that already hold an array", function() {
