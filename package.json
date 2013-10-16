@@ -10,6 +10,8 @@
   "author": "hontas",
   "license": "BSD",
   "devDependencies": {
-    
+    "karma-mocha": "~0.1.0",
+    "karma-chai": "0.0.2",
+    "karma-osx-reporter": "0.0.3"
   }
 }
