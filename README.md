@@ -24,7 +24,7 @@ by [@pontahontas][@pontahontas] October 2013
 
 A friend asked me the other day -*"Using only JavaScript, how can I read get-parameters from a URL and parse it into an object?"* And I thought - *Perfect opportunity for a little TDD!*
 
-I'm assuming you have some knowledge of JavaScript, [node][node] installed and that you know your way around a shell such as the [Terminal][terminalWiki] or [git-bash][git].
+I'm assuming you have some knowledge of JavaScript, that you have [node][node] installed and that you know your way around a shell such as the [Terminal][terminalWiki] or [git-bash][git].
 
 Now, you can go one of two ways here:
 
@@ -35,7 +35,7 @@ You'll find all files for this article here: [https://github.com/hontas/queryStr
 
 ## Our friend the requirements
 
-Turn the query string `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=` into a JavaScript object that look like this:
+Take the query string `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=` and turn it into a JavaScript object that look like this:
 
 ```js
 {
@@ -47,9 +47,9 @@ Turn the query string `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&
 
 ## Setup
 
-We'll be using [node][node] and [Karma][Karma] with the [mocha test framework][mocha] and [Chai assertion library][Chai] (they come bundled with Karma). I'll be using [my favorite text editor][Sublime], you can use whichever you like.
+We'll be using [Karma][Karma] as our test-runner, with the [mocha test framework][mocha] and [Chai assertion library][Chai]. I'll be using [my favorite text editor][Sublime], you can use whichever you like.
 
-Create a new folder for the project and navigate to it (I named mine *queryStringParser*)
+Begin by creating a new folder for the project and navigate to it (I named mine *queryStringParser*)
 
 ```
 mkdir queryStringParser
@@ -58,15 +58,16 @@ cd queryStringParser
 
 ### npm
 
-Managing dependencies is a very good thing, but maybe it's out of scope for this article. However I encourage you to use and read about `package.json` [here](http://blog.nodejitsu.com/package-dependencies-done-right) and [here][packagejson].
+Managing dependencies is a very good thing, but out of scope for this article. However I encourage you to use `package.json`, you can read about it [here](http://blog.nodejitsu.com/package-dependencies-done-right) and [here][packagejson].
 
 ### Karma
 
-Install [Karma][Karma] (globally), then install the karma-chai-plugin and finally create a karma configuration file. I list my answers below.
+Install [Karma][Karma] globally, then install the karma-mocha- and the karma-chai-plugin and finally create a karma configuration file. I list my answers below.
 
 ```
 npm install -g karma
-npm install -g karma-chai
+npm install karma-mocha
+npm install karma-chai
 karma init
 ```
 * testing framework: *mocha*
@@ -79,7 +80,7 @@ karma init
 
 **Note:** If you're on windows, you might have to set an environment variable like `CHROME_BIN=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe` to get the chrome launcher to work. You can [read about how to do this here](http://www.nextofwindows.com/how-to-addedit-environment-variables-in-windows-7/).
 
-Open the newly created file `karma.conf.js` in your favorite text editor and add *chai* to frameworks. If you're on a mac, you'll want the osx-reporter too, install `npm install -g karma-osx-reporter` and add it to reporters.
+Open the newly created file `karma.conf.js` in your favorite text editor and add *chai* to frameworks. If you're on a mac, you'll want the osx-reporter too, install `npm install karma-osx-reporter` and add it to reporters.
 
 ```js
 // karma.conf.js
@@ -87,12 +88,12 @@ frameworks: ['mocha', 'chai'],
 reporters: ['progress', 'osx'],
 ```
 
-#### Create two files
+#### Create file structure
 
-Finally create two files, `js/queryStringParser.js` and `test/queryStringParser-test.js` - these files correspond to the file pattern we set up in the `karma.conf.js`-file.
+Finally create two folders and two files, `js/queryStringParser.js` and `test/queryStringParser-test.js` - these files correspond to the file pattern we set up in the `karma.conf.js`-file.
 
-Finally try it out by typing `karma start` in your shell which should output something like this:
-![revolunet logo](img/karma-start.png "revolunet logo")
+Try it out by typing `karma start` in your shell which should output something like this:
+![screen snapshot of shell](img/karma-start.png)
  The `ERROR` is just saying thet we have no tests yet, so let's take care of that.
 
 ## Writing tests
@@ -101,7 +102,9 @@ The philosophy of [test driven development][TDD] is that you cannot write a sing
 
 ### Our first failing test case
 
-We're using [the mocha test framework][mocha] with [Chai assertian library][Chai] and we'll be writing our tests in [BDD-flavor][BDD]. To read up on the Chai-syntax, [take a look here](http://chaijs.com/api/bdd/) and keep it open for reference. Open up `test/queryStringParser-test.js` and enter:
+We're using [the mocha test framework][mocha] with [Chai assertian library][Chai] and we'll be writing our tests in [BDD-flavor][BDD]. To read up on the Chai-syntax, [take a look here](http://chaijs.com/api/bdd/) and keep it open for reference.
+
+We will create a function that transforms the query string into a js-object, so open up `test/queryStringParser-test.js` and enter:
 
 ```js
 describe("queryStringParser", function() {
@@ -115,36 +118,17 @@ First we *describe* what it is we will be testing, `queryStringParser`. Inside o
 
 The *it* also takes an anonymous function callback, and it's within this that we perform our test using *expect*. There are other ways to test, more on that [here][mocha] and [here][Chai].
 
-Save the file and take a look at the tests in your shell - it should fail. Now let's fix the failing test. In `js/queryStringParser.js` enter:
+Save the file and take a look at the test in your shell - it should fail. To fix it open up `js/queryStringParser.js` and enter:
 
 ```js
 var queryStringParser = function() {};
 ```
 
-Take a look at the test again, it should now be green. Awesome! Test driven development FTW! Give yourself a big pat on the back and let's continue. Our approach is to **not write any code** without **first having written a failing test**, so let's do that (after the first *it*):
+Take a look at the test again, it should now be green. Awesome! Test driven development FTW! Give yourself a big pat on the back and let's continue. Our approach is to **not write any code** without **first having written a failing test**. This means we need another test!
 
-### Test function output
+### Test function input
 
-```js
-it("should return an object", function() {
-	var res = queryStringParser();
-	expect(res).to.be.an("object");
-});
-```
-
-Make sure it's failing, and then make it pass.
-
-```js
-var queryStringParser = function() {
-	return {};
-};
-```
-
-We only want to make the test pass, **nothing more** - faithfully abiding to [the principle of least effort](http://en.wikipedia.org/wiki/Principle_of_least_effort).
-
-### Test input and test case order
-
-Since we will be handling queryStrings we should write a test to make sure the the input is a string. We'll do that with an *asynchronous* test, meaning that the test case will not be fulfilled until `done()` is called. Notice the `done` in `function(done)`.
+Since we will be parsing a *query string* we may want to throw an error if the input is not a string. We'll test for that with an *asynchronous* test, meaning that the test case will not be fulfilled until `done()` is called. Notice the `done` in `function(done)`. Put this test below the first *it*.
 
 ```js
 it("should throw error if input is not a string", function(done) {
@@ -163,12 +147,32 @@ var queryStringParser = function(queryString) {
 	if ("string" !== typeof queryString) {
 		throw new Error("Input parameter must be string");
 	}
+};
+```
+
+### Test function output
+
+The requirements state that we should *"turn it [the query string] into a JavaScript object"*, so let's make sure the function returns just that.
+
+```js
+it("should return an object", function() {
+	var res = queryStringParser('');
+	expect(res).to.be.an("object");
+});
+```
+
+Notice I'm passing an empty string to `querStringParser()` above, because otherwise it will throw the error we specified before. Make sure it's failing, and then make it pass.
+
+```js
+var queryStringParser = function(queryString) {
+	if ("string" !== typeof queryString) {
+		throw new Error("Input parameter must be string");
+	}
 	return {};
 };
 ```
-Hmm, not working. Why? Because the second last test we wrote is now failing. This would not had been a problem if we'd written the input test first. *Something to remember.*
 
-So let's add an empty string in the previous tests function call: `var res = queryStringParser('');`
+We only want to make the test pass, **nothing more** - faithfully abiding to [the principle of least effort](http://en.wikipedia.org/wiki/Principle_of_least_effort).
 
 ### Test output data
 
@@ -190,7 +194,7 @@ var queryStringParser = function(queryString) {
 
 	var ret = {};
 
-	// extract key/value-pairs
+	// extract keys
 	queryString.split('&').forEach(function(keyVal) {
 		ret[keyVal.split('=')[0]] = "";
 	});
@@ -214,6 +218,7 @@ it("should return object with keys extracted from queryString", function() {
 Make sure the tests are failing, and then
 
 ```js
+// extract key/value-pairs
 queryString.split('&').forEach(function(keyVal) {
 	var keyValArr = keyVal.split('='),
 		key = keyValArr[0],
