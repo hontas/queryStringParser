@@ -18,22 +18,29 @@
 [TDD]: http://en.wikipedia.org/wiki/Test-driven_development
 [@pontahontas]: https://twitter.com/pontahontas
 
-# Test driving TDD
+# Test-driving TDD
 
-by [@pontahontas][@pontahontas] October 2013
+by [@pontahontas][@pontahontas] November 2013
 
-A friend asked me the other day -*"Using only JavaScript, how can I read get-parameters from a URL and parse it into an object?"* And I thought - *Perfect opportunity for a little TDD!*
+A friend asked me the other day - *How can I read get-parameters from a URL and parse it into a JavaScript object?* And I thought - *Perfect opportunity for a little TDD!*
 
 I'm assuming you have some knowledge of JavaScript, that you have [node][node] installed and that you know your way around a shell such as the [Terminal][terminalWiki] or [git-bash][git].
 
-Now, you can go one of two ways here:
-
-1. Keep reading this document (which holds both the test cases and my solutions to them)
-2. Go to and read [another document I prepared][feedme] (which hold only the test cases)
-
 You'll find all files for this article here: [https://github.com/hontas/queryStringParser][githubProj]
 
-## Our friend the requirements
+## What is test-driven development?
+
+TDD is a software development process that looks like this:  
+![TDD process](https://docs.google.com/drawings/d/17Ti_roFxixFHT8EuFZkPxR7ZVvdfnP0SlrjgS2fIOhI/pub?w=437&h=438)  
+
+Want to know more, check this out:
+
+* [Test-driven development (wikipedia)][TDD]
+* [JavaScript TDD by Ricky Clegg (slides)](https://speakerdeck.com/rickyclegg/javascript-tdd)
+* [Test-Driven JavaScript Development (book)](http://tddjs.com/)
+* [Programming, only better, by Bodil (vimeo)](http://vimeo.com/74452549)
+
+## Requirements
 
 Take the query string `?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=` and turn it into a JavaScript object that look like this:
 
@@ -80,20 +87,20 @@ karma init
 
 **Note:** If you're on windows, you might have to set an environment variable like `CHROME_BIN=%ProgramFiles(x86)%\Google\Chrome\Application\chrome.exe` to get the chrome launcher to work. You can [read about how to do this here](http://www.nextofwindows.com/how-to-addedit-environment-variables-in-windows-7/).
 
-Open the newly created file `karma.conf.js` in your favorite text editor and add *chai* to frameworks. If you're on a mac, you'll want the osx-reporter too, install `npm install karma-osx-reporter` and add it to reporters.
+Open the newly created file `karma.conf.js` in your favorite text editor and add *chai* to frameworks. If you're on a mac, you'll want the osx-reporter too: `npm install karma-osx-reporter` and add it to reporters.
 
 ```js
 // karma.conf.js
 frameworks: ['mocha', 'chai'],
-reporters: ['progress', 'osx'],
+reporters: ['progress', 'osx'], // if you're on a mac
 ```
 
-#### Create file structure
+#### File structure
 
-Finally create two folders and two files, `js/queryStringParser.js` and `test/queryStringParser-test.js` - these files correspond to the file pattern we set up in the `karma.conf.js`-file.
+Finally create two folders and two files, `js/queryStringParser.js` and `test/queryStringParser-test.js` - which correspond to the file pattern we set up in the `karma.conf.js`-file.
 
-Try it out by typing `karma start` in your shell which should output something like this:
-![screen snapshot of shell](img/karma-start.png)
+Try it out by typing `karma start` in your shell which should output something like this:  
+![screen snapshot of shell](img/karma-start.png)  
  The `ERROR` is just saying thet we have no tests yet, so let's take care of that.
 
 ## Writing tests
@@ -114,9 +121,9 @@ describe("queryStringParser", function() {
 });
 ```
 
-First we *describe* what it is we will be testing, `queryStringParser`. Inside of the anonymous function callback comes our tests, defined by *it*. You don't have to begin all of the tests names	 with *should* but I think it's a good way to start a sentence that will be describing a test, so I'm going with that.
-
-The *it* also takes an anonymous function callback, and it's within this that we perform our test using *expect*. There are other ways to test, more on that [here][mocha] and [here][Chai].
+First we `describe` what it is we will be testing: *"queryStringParser"*.  
+Then we describe what `it` is we expect: *"should be a function"*.  
+And last we test if our `expect`-ations are true.
 
 Save the file and take a look at the test in your shell - it should fail. To fix it open up `js/queryStringParser.js` and enter:
 
@@ -128,7 +135,7 @@ Take a look at the test again, it should now be green. Awesome! Test driven deve
 
 ### Test function input
 
-Since we will be parsing a *query string* we may want to throw an error if the input is not a string. We'll test for that with an *asynchronous* test, meaning that the test case will not be fulfilled until `done()` is called. Notice the `done` in `function(done)`. Put this test below the first *it*.
+Since we will be parsing a *query string* we may want to throw an error if the input is not a string. We'll test for that with an *asynchronous* test, meaning that the test case will not be fulfilled until `done()` is called. Notice the `done` in `function(done)`. Put this test below the first `it`.
 
 ```js
 it("should throw error if input is not a string", function(done) {
@@ -326,102 +333,11 @@ Hallelujah, it's working! Praise the test driven JavaScript [flying spaghetti mo
 
 ## Refactoring the code
 
-With all those tests making sure our code is working you can go ahead and re-factor it in a worry-free fashion! The latest version of the tests and the code is on [github][githubProj], and below is how far we have come now.
+With all those tests making sure our code is working you can go ahead and re-factor it in a worry-free fashion!
+Below are links to the latest version of the files.
 
-```js
-// test/queryStringParser-test.js
-describe("queryStringParser", function() {
-	it("should be a function", function() {
-		expect(queryStringParser).to.be.a('function');
-	});
-
-	it("should return an object", function() {
-		var res = queryStringParser("");
-		expect(res).to.be.an("object");
-	});
-
-	it("should throw error if input is not a string", function(done) {
-		try {
-			queryStringParser();
-		} catch (e) {
-			done();
-		}
-	});
-
-	it("should return object with keys extracted from queryString", function() {
-		var res = queryStringParser('key=value&prop=thing');
-		expect(res).to.have.property('key').that.equal('value');
-		expect(res).to.have.property('prop').that.equal('thing');
-	});
-
-	it("should remove the initial question mark from queryString", function() {
-		expect(queryStringParser("?key=val")).to.have.property("key");
-	});
-
-	it("should replace each escaped sequence in the encoded URI component", function() {
-		var author = "Arthur C. Clarke",
-			res = queryStringParser("?author=" + encodeURIComponent(author));
-		expect(res.author).to.equal(author);
-	});
-
-	it("should turn +-separated values into array", function() {
-		var letters = "A+B+C+D",
-			res = queryStringParser("?letters=" + encodeURIComponent(letters));
-		expect(res.letters).to.eql(letters.split("+"));
-	});
-
-	it("should concatenate values to keys that already hold an array", function() {
-		var res = queryStringParser("nums=1%2B2&nums=3%2B4");
-		expect(res.nums).to.eql(['1', '2', '3', '4']);
-	});
-
-	it("should meet the requirements", function() {
-		var str = '?taste=sweet%2Bsour&taste=salty%2Bdelicious&taste=frosty&start=&end=',
-			res = queryStringParser(str);
-		expect(res).to.have.property('taste')
-			.that.eql(['sweet', 'sour', 'salty', 'delicious', 'frosty']);
-		expect(res).to.have.property('start').that.equal("");
-		expect(res).to.have.property('end').that.equal("");
-	});
-});
-```
-
-```js
-// js/queryStringParser.js
-var queryStringParser = function(queryString) {
-	if ("string" !== typeof queryString) {
-		throw new Error("Input parameter must be string");
-	}
-
-	var ret = {};
-
-	if (queryString.charAt(0) === "?") {
-		queryString = decodeURIComponent(queryString.slice(1));
-	} else {
-		queryString = decodeURIComponent(queryString);
-	}
-
-	// extract key/value-pairs
-	queryString.split('&').forEach(function(keyVal) {
-		var keyValArr = keyVal.split('='),
-			key = keyValArr[0],
-			val = keyValArr[1];
-
-		if (/\+/.test(val)) {
-			val = val.split("+");
-		}
-
-		if (ret[key] && Array.isArray(ret[key])) {
-			val = ret[key].concat(val);
-		}
-
-		ret[key] = val;
-
-	});
-
-	return ret;
-};
-```
+* [test/queryStringParser-test.js](https://github.com/hontas/queryStringParser/blob/master/test/queryStringParser-test.js)
+* [js/queryStringParser.js](https://github.com/hontas/queryStringParser/blob/master/js/queryStringParser.js)
 
 ## Suggested improvements
 
