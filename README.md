@@ -26,8 +26,6 @@ A friend asked me the other day - *How can I read get-parameters from a URL and 
 
 I'm assuming you have some knowledge of JavaScript, that you have [node][node] installed and that you know your way around a shell such as the [Terminal][terminalWiki] or [git-bash][git].
 
-You'll find all files for this article here: [https://github.com/hontas/queryStringParser][githubProj]
-
 ## What is test-driven development?
 
 TDD is a software development process that looks like this:  
@@ -343,7 +341,7 @@ Below are links to the latest version of the files.
 
 1. Maybe my friend decides he wanna be able to throw a whole URL on the function, then our question-mark-splice-remover no longer holds up. Try to add a test case for this and then improve the code to handle whole URL's as well.
 
-2. What if the new value is an array but not the old? Try writing a test case that account for that and then get it working.
+2. What if the new value is an array but not the old? Try writing a test case that account for that and then make it work.
 
 ## Taking it further
 
