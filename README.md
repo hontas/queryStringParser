@@ -1,5 +1,5 @@
 [node]: http://nodejs.org/
-[mocha]: http://visionmedia.github.io/mocha/
+[mocha]: http://mochajs.org/
 [Karma]: http://karma-runner.github.io/0.10/
 [Chai]: http://chaijs.com/
 [Sublime]: http://www.sublimetext.com/
@@ -145,7 +145,7 @@ it("should throw error if input is not a string", function(done) {
 });
 ```
 
-You can [read more about testing asynchronous code here](http://visionmedia.github.io/mocha/#asynchronous-code).
+You can [read more about testing asynchronous code here](http://mochajs.org/#asynchronous-code).
 
 ```js
 var queryStringParser = function(queryString) {
@@ -345,7 +345,7 @@ Below are links to the latest version of the files.
 
 ## Taking it further
 
-This was one very simple function, but when you are working with, let's say objects and methods, then it's a good idea to nest the `describe`'s so that they reflect the structure of the code. I put a hash before method names and a dot before property names and I also frequently make use of `beforeEach` which executes before each test. Below is an example to give you an idea. You can read more about it on [mocha's website](http://visionmedia.github.io/mocha/).
+This was one very simple function, but when you are working with, let's say objects and methods, then it's a good idea to nest the `describe`'s so that they reflect the structure of the code. I put a hash before method names and a dot before property names and I also frequently make use of `beforeEach` which executes before each test. Below is an example to give you an idea. You can read more about it on [mocha's website](http://mochajs.org/).
 
 I also highly recommend trying out [sinonjs][Sinon] which gives you `spies`, `mocks`, `stubs` and a whole range of other tools that make your testing days easier than winning a tanning contest with a true nerd.
 
